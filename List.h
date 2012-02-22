@@ -3,6 +3,7 @@
 */
 #ifndef __LIST_H__
 #define __LIST_H__
+#include <iostream>
 using namespace std;
 
 template <class T>
@@ -31,12 +32,6 @@ public:
 	{
 		first = new node();
 		size = 0;
-	}
-	// Copy Constructor
-	List(const List& copy)
-	{
-		first = copy->first;
-		size = copy.size;
 	}
 	// Destructor
 	~List()
@@ -117,9 +112,9 @@ public:
 			size--;				// Decrement size
 			return data;		// Return stored data
 		}
-		else	// Throws bad allocation exception
-			;//throw PopEmptyListException(); TODO
-	}
+		else	// Trying to pop an empty list throws an unhandled exception
+			;	// And there doesn't seem to be any way to return a safe value
+	}			// under the limitations of the template
 
 	// Returns data of type T from the front of the list and removes node
 	T Pop_Front()
@@ -140,8 +135,8 @@ public:
 			size--;					// Decrement size
 			return data;			// Return stored data
 		}
-		else	// Throws bad allocation exception
-			;//throw PopEmptyListException(); TODO
+		else	// Throws unhandled exception like Pop_Back()
+			;
 	}
 
 	// Returns size of list
@@ -151,10 +146,10 @@ public:
 	int SizeCheck()
 	{
 		int count = 1;
+		node *ptr;
+			ptr = first;
 		while (1)	// Run until break
 		{
-			node *ptr;
-			ptr = first;
 			if (ptr->next == NULL)	// End of list
 				break;
 			else
@@ -186,9 +181,10 @@ public:
 	// Inserts a new node into list at location index
 	void Insert(T data, int index)
 	{
+		if (index >= size)
+			return;	// TODO: throw an error
 		node *ptr;
 		ptr = first;
-		// if (index >= size) throw IndexOutOfBoundsException(); TODO
 		for (int i = 1; i < index; i++) // Traverse list to just before
 			ptr = ptr->next;			// index to place new value
 		node *forwardnode;
@@ -200,15 +196,17 @@ public:
 	// Deletes a node at location index
 	void Delete(int index)
 	{
+		if (index >= size)
+			return;	// TODO: throw an error
 		node *ptr;
 		ptr = first;
 		for (int i = 1; i < index; i++)	// Traverse list to just before
 			ptr = ptr->next;			// index
 		node *prevptr = ptr, *nextptr = ptr->next->next;
 		ptr = ptr->next;
-		ptr->data = NULL;
 		delete ptr;
 		prevptr->next = nextptr;
+		size--;
 	}
 
 	// Searches for a node containing value 
@@ -216,15 +214,15 @@ public:
 	T *Search(T value)
 	{
 		if (first->data == value) // If data is in first node
-			return first->data;
+			return &first->data;
 		node *ptr = first;
 		while (ptr->next != NULL) // else search the list 
 		{
 			ptr = ptr->next;
 			if (ptr->data == value)
-				return ptr->data;
+				return &ptr->data;
 		}
-		return NULL	// Value not found
+		return NULL;	// Value not found
 	}
 };
 #endif
